@@ -1,0 +1,30 @@
+[Package]
+version: 1
+depends:
+incremental: False
+
+[Product]
+type: localboot
+id: dfn_dotnet
+name: .NET
+description: NET Framework is a software framework that includes a large class library and provides language interoperability across several programming languages.
+advice: 
+version: 4.5.2
+priority: 0
+licenseRequired: False
+productClasses:
+setupScript: setup.opsiscript
+uninstallScript: uninstall.opsiscript
+updateScript: 
+alwaysScript: 
+onceScript: 
+customScript: 
+userLoginScript: 
+
+[Changelog]
+
+dotnet (4.5.2-1) stable; urgency=low
+
+  * Initial version
+
+ -- Eric Esser <esser@wzb.eu> Fri, 08 May 2015 12:04:18 + 0100
