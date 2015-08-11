@@ -25,7 +25,7 @@ Set $ProductId$       = "dotnet"
 Set $PrettyName$			= ".NET"
 Set $LicenseRequired$ = "false"
 Set $LicensePool$     = "p_" + $ProductId$
-Set $SetupFile$ 			= "dotnetfx45_full_x86_x64.exe"
+Set $SetupFile$ 			= "NDP46-KB3045557-x86-x64-AllOS-ENU.exe"
 ; ----------------------------------------------------------------
 
 

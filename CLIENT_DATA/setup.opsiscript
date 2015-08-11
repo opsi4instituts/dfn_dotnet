@@ -29,14 +29,14 @@ Set $LogDir$ = "%opsiLogDir%"
 ; therefore please: only lower letters, no umlauts, 
 ; no white space use '-' as a seperator
 Set $ProductId$       = "dotnet"
-Set $Version$					= "4.5.2"
+Set $Version$					= "4.6"
 Set $PrettyName$			= ".NET"
 Set $MinimumSpace$    = "500 MB"
 ; the path were we find the product after the installation
 Set $LicenseRequired$ = "false"
 Set $LicensePool$     = "p_" + $ProductId$
 ; ----------------------------------------------------------------
-Set $SetupFile$ = "dotnetfx45_full_x86_x64.exe"
+Set $SetupFile$ = "NDP46-KB3045557-x86-x64-AllOS-ENU.exe"
 ; ----------------------------------------------------------------
 
 if not(HasMinimumSpace ("%SystemDrive%", $MinimumSpace$))
@@ -47,11 +47,11 @@ else
 	comment "Show product picture"
 	ShowBitmap "%ScriptPath%\" + $ProductId$ + ".png" $PrettyName$ + " " + $Version$
 	
-	if FileExists("%ScriptPath%\delsub.opsiscript")
-		comment "Start uninstall sub section"
-		Sub "%ScriptPath%\delsub.opsiscript"
-	endif
-	
+;	if FileExists("%ScriptPath%\delsub.opsiscript")
+;		comment "Start uninstall sub section"
+;		Sub "%ScriptPath%\delsub.opsiscript"
+;	endif
+;	
 	Message "Installing " + $PrettyName$ + " ..."
 	
 	if $LicenseRequired$ = "true"
