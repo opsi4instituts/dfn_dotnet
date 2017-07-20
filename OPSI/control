@@ -9,7 +9,7 @@ id: dfn_dotnet
 name: .NET
 description: NET Framework is a software framework that includes a large class library and provides language interoperability across several programming languages.
 advice: 
-version: 4.6
+version: 4.7.2053.0
 priority: 0
 licenseRequired: False
 productClasses: 
@@ -21,10 +21,48 @@ onceScript:
 customScript: 
 userLoginScript: 
 
+[ProductProperty]
+type: bool
+name: remove-older-versions
+description: Remove older versions of .NET 4.x
+default: True
+
+[ProductProperty]
+type: bool
+name: forcereinstall
+description: Forces installation even if already installed
+default: False
+
+[ProductProperty]
+type: unicode
+name: custom-post-install
+multivalue: False
+editable: False
+description: Define filename for include script in custom directory after installation
+values: ["none", "post-install.opsiinc"]
+default: ["none"]
+
+[ProductProperty]
+type: unicode
+name: custom-post-deinstall
+multivalue: False
+editable: False
+description: Define filename for include script in custom directory after deinstallation
+values: ["none", "post-deinstall.opsiinc"]
+default: ["none"]
+
+[ProductProperty]
+type: unicode
+name: german-language-pack
+multivalue: True
+editable: False
+description: Installs the German language pack.
+values: ["auto", "false", "true"]
+default: ["auto"]
+
 [Changelog]
 dotnet (4.5.2-1) stable; urgency=low
 
   * Initial version
 
  -- Eric Esser <esser@wzb.eu> Fri, 08 May 2015 12:04:18 + 0100
-

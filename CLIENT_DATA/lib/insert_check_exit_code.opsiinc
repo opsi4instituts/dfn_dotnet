@@ -1,0 +1,11 @@
+; This sourcecode published under the Terms of the General Public License.
+; Written by Eric Esser, Wissenschaftszentrum Berlin, eric.esser@wzb.eu.
+; Inspired by uib gmbh (www.uib.de), Thomas Besser (KIT), Detlef Krummel (GEI) and Tobias Friede (Fraunhofer)
+
+;==========================================================================================================
+; Variables 
+DefVar $ExitCode$
+
+;==========================================================================================================
+; Includes
+include_append "section_sub_check_exitcode.opsiinc"

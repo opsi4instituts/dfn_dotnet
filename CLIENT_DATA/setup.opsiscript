@@ -1,184 +1,76 @@
-; Copyright (c) uib gmbh (www.uib.de)
-; This sourcecode is owned by uib
-; and published under the Terms of the General Public License.
-; credits: http://www.opsi.org/en/credits/
+; This sourcecode published under the Terms of the General Public License.
+; Written by Eric Esser, Wissenschaftszentrum Berlin, eric.esser@wzb.eu.
+; Inspired by uib gmbh (www.uib.de), Thomas Besser (KIT), Detlef Krummel (GEI) and Tobias Friede (Fraunhofer)
 
 [Actions]
-requiredWinstVersion >= "4.11.4.6"
+;==========================================================================================================
+; Includes
+include_insert "%ScriptPath%\common.opsiinc"
 
-DefVar $MsiId$
-DefVar $UninstallProgram$
-DefVar $LogDir$
-DefVar $ProductId$  
-DefVar $MinimumSpace$
-DefVar $InstallDir$
-DefVar $ExitCode$
-DefVar $LicenseRequired$
-DefVar $LicenseKey$
-DefVar $LicensePool$
-DefVar $Version$
-DefVar $PrettyName$
-DefVar $SetupFile$
+;==========================================================================================================
+; Variables 
+DefVar $CustomPostInstall$
+DefVar $SetupString$
+DefVar $SetupStringDeutsch$
 
-Set $LogDir$ = "%opsiLogDir%"
+Set $SetupString$ = "%ScriptPath%" + "\" +  $SetupFile$
+Set $SetupStringDeutsch$ = "%ScriptPath%" + "\" +  $SetupFileDeutsch$
+;==========================================================================================================
+; Program logic
 
-; ----------------------------------------------------------------
-; - Please edit the following values                             -
-; ----------------------------------------------------------------
-;$ProductId$ should be the name of the product in opsi
-; therefore please: only lower letters, no umlauts, 
-; no white space use '-' as a seperator
-Set $ProductId$       = "dotnet"
-Set $Version$					= "4.6"
-Set $PrettyName$			= ".NET"
-Set $MinimumSpace$    = "500 MB"
-; the path were we find the product after the installation
-Set $LicenseRequired$ = "false"
-Set $LicensePool$     = "p_" + $ProductId$
-; ----------------------------------------------------------------
-Set $SetupFile$ = "NDP46-KB3045557-x86-x64-AllOS-ENU.exe"
-; ----------------------------------------------------------------
+comment "Show product picture"
+ShowBitmap "%ScriptPath%\" + $ProductId$ + ".png" $PrettyName$ + " " + $Version$
+Message "Installing " + $ProductId$ + " ..."
 
 if not(HasMinimumSpace ("%SystemDrive%", $MinimumSpace$))
 	LogError "Not enough space on %SystemDrive%, " + $MinimumSpace$ + " on drive %SystemDrive% needed for " + $ProductId$
-	isFatalError
+	isFatalError "Not enought space on %SystemDrive%"
 	; Stop process and set installation status to failed
-else
-	comment "Show product picture"
-	ShowBitmap "%ScriptPath%\" + $ProductId$ + ".png" $PrettyName$ + " " + $Version$
-	
-;	if FileExists("%ScriptPath%\delsub.opsiscript")
-;		comment "Start uninstall sub section"
-;		Sub "%ScriptPath%\delsub.opsiscript"
-;	endif
-;	
-	Message "Installing " + $PrettyName$ + " ..."
-	
-	if $LicenseRequired$ = "true"
-		comment "Licensing required, reserve license and get license key"
-		Sub_get_licensekey
+endif
+
+if ((GetRegistryStringValue64("["+$ActVersionRegPath$+"] DisplayName") = "") or (getProductProperty("forcereinstall","False") = "True"))	
+  if FileExists($SetupString$)
+		comment "Start setup program"
+	  ChangeDirectory "%SCRIPTPATH%"
+    Winbatch_install
+	  Sub_check_exitcode
+  	ExitWindows /Reboot
+	else
+	  LogError "No setup file found, please check the OPSI package"
+	  isFatalError "No Setup file found"
 	endif
-	
-	comment "Start setup program"
-	ChangeDirectory "%SCRIPTPATH%"
-	Winbatch_install
-	Sub_check_exitcode
+else
+  comment $PrettyName$ + " " + $Version$ + " already installed. No forced reinstall selected, thus skipping installation"
+  message $PrettyName$ + " " + $Version$ + " already installed. No forced reinstall selected, thus skipping installation"
+endif
+
+if ((GetRegistryStringValue64("["+$ActVersionRegPathDeutsch$+"] DisplayName") = "") or (getProductProperty("forcereinstall","False") = "True"))	
+  if ((getProductProperty("german-language-pack","auto") = "True") or ((getProductProperty("german-language-pack","auto") = "auto") and ($system_language$ = "0407") ) )
+	  Set $SetupString$ = "%ScriptPath%" + "\" + $SetupFileDeutsch$
+    if FileExists($SetupString$)
+		  comment "Installing German language pack"
+		  message "Installing German language pack"
+	    ChangeDirectory "%SCRIPTPATH%"
+      Winbatch_install
+	    Sub_check_exitcode
+	    ExitWindows /Reboot
+	  else
+	    LogError "No German language pack file found, please check the OPSI package"
+	    isFatalError "No German language pack file found"
+	  endif
+	endif
+else
+  comment $PrettyName$ + " " + $Version$ + " German language pack already installed. No forced reinstall selected, thus skipping installation"
+  message $PrettyName$ + " " + $Version$ + " German language pack  already installed. No forced reinstall selected, thus skipping installation"
+endif
+
+comment "include custom post install file"
+set $CustomPostInstall$ = getProductProperty("custom-post-install","none")
+if not ($CustomPostInstall$ = "none")
+  if FileExists("%ScriptPath%\custom\" + $CustomPostInstall$)
+    include_insert "%ScriptPath%\custom\" + $CustomPostInstall$
+  endif
 endif
 
 [Winbatch_install]
-"%ScriptPath%\$SetupFile$" /q /norestart
-
-[Files_install]
-; Example of recursively copying some files into the installation directory:
-;
-; copy -s "%ScriptPath%\files\*.*" "$InstallDir$"
-
-[Registry_install]
-; Example of setting some values of an registry key:
-;
-; openkey [HKEY_LOCAL_MACHINE\Software\$ProductId$]
-; set "name1" = "some string value"
-; set "name2" = REG_DWORD:0001
-; set "name3" = REG_BINARY:00 af 99 cd
-
-[LinkFolder_install]
-; Example of deleting a folder from AllUsers startmenu:
-;
-; set_basefolder common_programs
-; delete_subfolder $ProductId$
-;
-; Example of creating an shortcut to the installed exe in AllUsers startmenu:
-;
-; set_basefolder common_programs
-; set_subfolder $ProductId$
-;
-; set_link
-; 	name: $ProductId$
-; 	target: <path to the program>
-; 	parameters:
-; 	working_dir: $InstallDir$
-; 	icon_file:
-; 	icon_index:
-; end_link
-;
-; Example of creating an shortcut to the installed exe on AllUsers desktop:
-;
-; set_basefolder common_desktopdirectory
-; set_subfolder ""
-;
-; set_link
-; 	name: $ProductId$
-; 	target: <path to the program>
-; 	parameters: <some_param>
-; 	working_dir: $InstallDir$
-; 	icon_file: <path to icon file>
-; 	icon_index: 2
-; end_link
-
-[Sub_get_licensekey]
-if opsiLicenseManagementEnabled
-	comment "License management is enabled and will be used"
-
-	comment "Trying to get a license key"
-	Set $LicenseKey$ = demandLicenseKey ($LicensePool$)
-	; If there is an assignment of exactly one licensepool to the product the following call is possible:
-	; Set $LicenseKey$ = demandLicenseKey ("", $ProductId$)
-	;
-	; If there is an assignment of a license pool to a windows software id, it is possible to use:
-	; DefVar $WindowsSoftwareId$
-	; $WindowsSoftwareId$ = "..."
-	; Set $LicenseKey$ = demandLicenseKey ("", "", $WindowsSoftwareId$)
-	
-	DefVar $ServiceErrorClass$
-	set $ServiceErrorClass$ = getLastServiceErrorClass
-	comment "Error class: " + $ServiceErrorClass$
-	
-	if $ServiceErrorClass$ = "None"
-		comment "Everything fine, we got the license key '" + $LicenseKey$ + "'"
-	else
-		if $ServiceErrorClass$ = "LicenseConfigurationError"
-			LogError "Fatal: license configuration must be corrected"
-			LogError getLastServiceErrorMessage
-			isFatalError
-		else 
-			if $ServiceErrorClass$ = "LicenseMissingError"
-				LogError "Fatal: required license is not supplied"
-				isFatalError
-			endif
-		endif
-	endif
-else
-	LogError "Fatal: license required, but license management not enabled"
-	isFatalError
-endif
-
-
-[Sub_check_exitcode]
-comment "Test for installation success via exit code"
-set $ExitCode$ = getLastExitCode
-; informations to exit codes see
-; http://msdn.microsoft.com/en-us/library/aa372835(VS.85).aspx
-; http://msdn.microsoft.com/en-us/library/aa368542.aspx
-if ($ExitCode$ = "0")
-	comment "Looks good: setup program gives exitcode zero"
-else
-	comment "Setup program gives a exitcode unequal zero: " + $ExitCode$
-	if ($ExitCode$ = "1605")
-		comment "ERROR_UNKNOWN_PRODUCT	1605	This action is only valid for products that are currently installed."
-		comment "Uninstall of a not installed product failed - no problem"
-	else
-		if ($ExitCode$ = "1641")
-			comment "looks good: setup program gives exitcode 1641"
-			comment "ERROR_SUCCESS_REBOOT_INITIATED	1641	The installer has initiated a restart. This message is indicative of a success."
-		else
-			if ($ExitCode$ = "3010")
-				comment "looks good: setup program gives exitcode 3010"
-				comment "ERROR_SUCCESS_REBOOT_REQUIRED	3010	A restart is required to complete the install. This message is indicative of a success."
-			else
-				logError "Fatal: Setup program gives an unknown exitcode unequal zero: " + $ExitCode$
-				isFatalError
-			endif
-		endif
-	endif
-endif
-
+"$SetupString$" /passive /norestart /log "$LogDir$\$ProductId$.install_log.txt"

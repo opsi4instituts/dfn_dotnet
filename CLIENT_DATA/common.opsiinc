@@ -1,0 +1,52 @@
+; This sourcecode published under the Terms of the General Public License.
+; Written by Eric Esser, Wissenschaftszentrum Berlin, eric.esser@wzb.eu.
+; Inspired by uib gmbh (www.uib.de), Thomas Besser (KIT), Detlef Krummel (GEI) and Tobias Friede (Fraunhofer)
+
+setloglevel = 6
+;  Log Errors in Logfile but don't abort:
+ExitOnError=false
+; Show syntax errors in the script:
+ScriptErrorMessages=on
+; Dont trace step by step through the script:
+TraceMode=off
+; let started programs run in front of the winst window
+StayOnTop=false
+requiredWinstVersion >= "4.11.5.0"
+
+;==========================================================================================================
+; Includes
+include_insert "%ScriptPath%\lib\insert_check_exit_code.opsiinc"
+
+;==========================================================================================================
+; Variables 
+
+DefVar $LogDir$
+DefVar $ProductId$ 
+DefVar $Version$ 
+DefVar $MinimumSpace$
+DefVar $PrettyName$
+DefVar $SetupFile$
+DefVar $SetupFileDeutsch$
+DefVar $system_language$ 
+DefVar $ActVersionMSIID$
+DefVar $ActVersionRegPath$
+DefVar $ActVersionRegPathDeutsch$
+DefStringList $languagemap$
+
+; ----------------------------------------------------------------
+; These values need to be adjusted to each version
+Set $ActVersionRegPath$			   = "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{BCF0C1F7-671C-3922-A7EA-8AC11F4FC0EB}"
+Set $ActVersionRegPathDeutsch$ = "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{CD88F457-D2FD-3127-B64D-D6E13EBBCED6}"
+Set $SetupFile$        			   = "NDP47-KB3186497-x86-x64-AllOS-ENU.exe"
+Set $SetupFileDeutsch$ 			   = stringReplace($SetupFile$, "ENU", "DEU")
+; ----------------------------------------------------------------
+; These values stay the same
+Set $LogDir$           			= "%opsiLogDir%"
+Set $ProductId$       		 	= "dfn_dotnet"
+Set $Version$								= strPart("%installingProdVersion%", "1", calculate(strPos("%installingProdVersion%","-") + "-" + "1" ))
+Set $PrettyName$		 				= ".NET"
+Set $MinimumSpace$    			= "2500 MB"
+Set $languagemap$     			= GetLocaleInfoMap
+Set $system_language$  			= lower(getValue("system_default_language_id", $languagemap$))
+
+; ----------------------------------------------------------------

@@ -1,0 +1,68 @@
+; This sourcecode published under the Terms of the General Public License.
+; Written by Eric Esser, Wissenschaftszentrum Berlin, eric.esser@wzb.eu.
+; Inspired by uib gmbh (www.uib.de), Thomas Besser (KIT), Detlef Krummel (GEI) and Tobias Friede (Fraunhofer)
+
+;==========================================================================================================
+; Functions
+
+; Main function which searches the uninstall path in the registry and then uses it for uninstalling the program. $UninstallSearchString$ and $RegPath$ have to be set outside this opsiinc file
+[sub_uninstall_by_registry]
+comment "Starting sub_uninstall_by_registry"
+Set $UninstallLog$ = $LogDir$ + "\" + $ProductId$ + ".uninstall_log.txt"
+Set $UninstallKeys$ = getRegistryKeyList32($RegPath$)
+for %uninstallkey% in $UninstallKeys$ do sub_check_uninstall_key
+
+Set $InstallationSystemType$ = GetSystemType
+if ($InstallationSystemType$ = "64 Bit System")
+   Set $UninstallKeys$ = getRegistryKeyList64($RegPath$) 
+   for %uninstallkey% in $UninstallKeys$ do sub_check_uninstall_key
+endif
+
+if (count($UninstallStrings$) = "0")
+  LogError "No uninstall string found in registry. Please try manual deinstallation on this machine"
+  isFatalError "No uninstall string found in registry."
+endif
+
+for %uninstallstring% in $UninstallStrings$ do sub_uninstall_msi
+
+
+; Checks if the string to be searched for is in the uninstall path of the registry. Fills all found refering uninstall keys in the array $UninstallStrings$
+[sub_check_uninstall_key]
+Set $RegString$ = "[" + $RegPath$ + "\%uninstallkey%\] "
+Set $DisplayName$ = GetRegistryStringValue($RegString$ + "DisplayName")
+if (strLength($DisplayName$) INT<= "27" ) 
+  if (strpart($DisplayName$, "1", "27") = $UninstallSearchString$)
+    Set $UninstallString$ = GetRegistryStringValue($RegString$ + "UninstallString")
+    if ($UninstallString$ = "")
+      LogWarning "Registry value found, but no uninstall string - continuing to search..."
+    else
+      Set $DoubleFlag$ = "false"
+      for %uninstallstring% in $UninstallStrings$ do sub_check_doubles
+      if ($DoubleFlag$ = "false")
+        Set $UninstallStrings$ = addtolist($UninstallStrings$, $UninstallString$)
+      endif
+    endif
+  endif
+endif
+
+
+; Prepares the uninstall string to be compatible with OPSI
+[sub_uninstall_msi]
+;MsiExec.exe /X{251659B0-5D87-41EC-B00B-D414E3713375}
+Set $FinalUninstallString$ = stringReplace("%uninstallstring%", "MsiExec.exe", "msiexec")
+;Winbatch_uninstall_msi
+comment "Stubb: Uninstalling " + $FinalUninstallString$ 
+Sub_check_exitcode
+
+
+; Does the actual uninstallation
+[Winbatch_uninstall_msi]
+;msiexec /x  $UninstMsiId$ /l*v $UninstallLog$ /qb! REBOOT=ReallySuppress
+$FinalUninstallString$  /l*v $UninstallLog$ /qb! REBOOT=ReallySuppress
+
+
+; Checks if the uninstall string is already in the list. Doubles lead to get OPSI stuck in deinstallation
+[sub_check_doubles]
+if ("%uninstallstring%" = $UninstallString$)
+  Set $DoubleFlag$ = "true"
+endif

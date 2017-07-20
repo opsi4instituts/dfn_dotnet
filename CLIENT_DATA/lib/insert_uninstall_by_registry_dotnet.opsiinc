@@ -1,0 +1,24 @@
+; This sourcecode published under the Terms of the General Public License.
+; Written by Eric Esser, Wissenschaftszentrum Berlin, eric.esser@wzb.eu.
+; Inspired by uib gmbh (www.uib.de), Thomas Besser (KIT), Detlef Krummel (GEI) and Tobias Friede (Fraunhofer)
+
+;==========================================================================================================
+; Variables 
+
+
+DefVar $DisplayName$
+DefVar $RegPath$
+DefVar $RegString$
+DefVar $UninstallString$
+DefVar $FinalUninstallString$
+DefVar $UninstallLog$ 
+DefVar $InstallationSystemType$
+DefVar $DoubleFlag$
+DefStringList $UninstallKeys$
+DefStringList $UninstallStrings$
+
+Set $RegPath$ = "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"
+
+;==========================================================================================================
+; Includes
+include_append "%ScriptPath%\lib\section_uninstall_by_registry_dotnet.opsiinc"
