@@ -9,12 +9,19 @@ include_insert "%ScriptPath%\common.opsiinc"
 
 ;==========================================================================================================
 ; Variables 
-DefVar $CustomPostInstall$
-DefVar $SetupString$
-DefVar $SetupStringDeutsch$
+DefVar $ActVersionRegPath$
+DefVar $ActVersionRegPathDeutsch$
 
-Set $SetupString$ = "%ScriptPath%" + "\" +  $SetupFile$
-Set $SetupStringDeutsch$ = "%ScriptPath%" + "\" +  $SetupFileDeutsch$
+DefVar $CustomPostInstall$
+DefVar $SetupFile$
+DefVar $SetupFileDeutsch$
+
+DefVar $SetupString$
+DefVar $SetupStringCommand$
+DefVar $SetupStringDeutsch$
+DefVar $Setup_prepatch_x64$
+DefVar $Setup_prepatch_x86$
+
 ;==========================================================================================================
 ; Program logic
 
@@ -28,49 +35,89 @@ if not(HasMinimumSpace ("%SystemDrive%", $MinimumSpace$))
 	; Stop process and set installation status to failed
 endif
 
+;patch
+if (CompareDotSeparatedNumbers(GetMsVersionInfo, "6.1") = "0")
+	comment "We are on NT5"
+	if FileExists ("%System%\D3DCompiler_47.dll")
+		comment "KB4019990 already installed"
+	else
+		Set $Setup_prepatch_x64$ = "Windows6.1-KB4019990-x64.msu"
+		Set $Setup_prepatch_x86$ = stringReplace($Setup_prepatch_x64$, "x64", "x86")
+		comment "we must install KB4019990"
+		message "we must install KB4019990"
+		if ($INST_SystemType$ = "64 Bit System") 
+			Set $SetupString$ = "%ScriptPath%" + "\" + $Setup_prepatch_x64$
+		else
+			Set $SetupString$ = "%ScriptPath%" + "\" + $Setup_prepatch_x86$
+		endif
+		Set $SetupStringCommand$ = "/quiet /norestart"
+		comment "we do install KB4019990"
+		message "we do install KB4019990"
+		ChangeDirectory "%SCRIPTPATH%"
+        Winbatch_install
+	endif
+endif
+
+;==========================================================================================================
+; Variables 
+; ----------------------------------------------------------------
+; These values need to be adjusted to each version
+Set $ActVersionRegPath$				= "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{BCF0C1F7-671C-3922-A7EA-8AC11F4FC0EB}"
+Set $ActVersionRegPathDeutsch$		= "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{CD88F457-D2FD-3127-B64D-D6E13EBBCED6}"
+Set $SetupFile$						= "NDP47-KB3186497-x86-x64-AllOS-ENU.exe"
+Set $SetupFileDeutsch$				= stringReplace($SetupFile$, "ENU", "DEU")
+
+; ----------------------------------------------------------------
+
+Set $SetupString$ 			= "%ScriptPath%" + "\" + $SetupFile$
+Set $SetupStringCommand$	= " /passive /norestart /log $LogDir$\$ProductId$.install_log.txt"
+Set $SetupStringDeutsch$	= "%ScriptPath%" + "\" +  $SetupFileDeutsch$
+
+		
 if ((GetRegistryStringValue64("["+$ActVersionRegPath$+"] DisplayName") = "") or (getProductProperty("forcereinstall","False") = "True"))	
   if FileExists($SetupString$)
 		comment "Start setup program"
-	  ChangeDirectory "%SCRIPTPATH%"
-    Winbatch_install
-	  Sub_check_exitcode
-  	ExitWindows /Reboot
+		ChangeDirectory "%SCRIPTPATH%"
+		Winbatch_install
+		Sub_check_exitcode
+		ExitWindows /Reboot
 	else
-	  LogError "No setup file found, please check the OPSI package"
-	  isFatalError "No Setup file found"
+		LogError "No setup file found, please check the OPSI package"
+		isFatalError "No Setup file found"
 	endif
 else
-  comment $PrettyName$ + " " + $Version$ + " already installed. No forced reinstall selected, thus skipping installation"
-  message $PrettyName$ + " " + $Version$ + " already installed. No forced reinstall selected, thus skipping installation"
+	comment $PrettyName$ + " " + $Version$ + " already installed. No forced reinstall selected, thus skipping installation"
+	message $PrettyName$ + " " + $Version$ + " already installed. No forced reinstall selected, thus skipping installation"
 endif
 
 if ((GetRegistryStringValue64("["+$ActVersionRegPathDeutsch$+"] DisplayName") = "") or (getProductProperty("forcereinstall","False") = "True"))	
-  if ((getProductProperty("german-language-pack","auto") = "True") or ((getProductProperty("german-language-pack","auto") = "auto") and ($system_language$ = "0407") ) )
-	  Set $SetupString$ = "%ScriptPath%" + "\" + $SetupFileDeutsch$
-    if FileExists($SetupString$)
-		  comment "Installing German language pack"
-		  message "Installing German language pack"
-	    ChangeDirectory "%SCRIPTPATH%"
-      Winbatch_install
-	    Sub_check_exitcode
-	    ExitWindows /Reboot
-	  else
-	    LogError "No German language pack file found, please check the OPSI package"
-	    isFatalError "No German language pack file found"
-	  endif
+	if ((getProductProperty("german-language-pack","auto") = "True") or ((getProductProperty("german-language-pack","auto") = "auto") and ($system_language$ = "0407") ) )
+		Set $SetupString$ = "%ScriptPath%" + "\" + $SetupFileDeutsch$
+		Set $SetupStringCommand$ = " /passive /norestart /log $LogDir$\$ProductId$.install_log.txt" 
+		if FileExists($SetupString$)
+			comment "Installing German language pack"
+			message "Installing German language pack"
+			ChangeDirectory "%SCRIPTPATH%"
+			Winbatch_install
+			Sub_check_exitcode
+			ExitWindows /Reboot
+		else
+			LogError "No German language pack file found, please check the OPSI package"
+			isFatalError "No German language pack file found"
+		endif
 	endif
 else
-  comment $PrettyName$ + " " + $Version$ + " German language pack already installed. No forced reinstall selected, thus skipping installation"
-  message $PrettyName$ + " " + $Version$ + " German language pack  already installed. No forced reinstall selected, thus skipping installation"
+	comment $PrettyName$ + " " + $Version$ + " German language pack already installed. No forced reinstall selected, thus skipping installation"
+	message $PrettyName$ + " " + $Version$ + " German language pack already installed. No forced reinstall selected, thus skipping installation"
 endif
 
 comment "include custom post install file"
 set $CustomPostInstall$ = getProductProperty("custom-post-install","none")
 if not ($CustomPostInstall$ = "none")
-  if FileExists("%ScriptPath%\custom\" + $CustomPostInstall$)
-    include_insert "%ScriptPath%\custom\" + $CustomPostInstall$
-  endif
+	if FileExists("%ScriptPath%\custom\" + $CustomPostInstall$)
+		include_insert "%ScriptPath%\custom\" + $CustomPostInstall$
+	endif
 endif
 
 [Winbatch_install]
-"$SetupString$" /passive /norestart /log "$LogDir$\$ProductId$.install_log.txt"
+$SetupString$ $SetupStringCommand$
