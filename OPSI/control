@@ -1,5 +1,5 @@
 [Package]
-version: 1
+version: 2
 depends: 
 incremental: False
 
@@ -61,6 +61,12 @@ values: ["auto", "false", "true"]
 default: ["auto"]
 
 [Changelog]
+dfn_dotnet (4.7.2053.0-1) stable; urgency=low
+
+Please add a short description.
+
+ -- Schmidt, Jan <Jan.Schmidt@dipf.de>  Thu, 24 Aug 2017 12:09:50 +0000
+
 dotnet (4.5.2-1) stable; urgency=low
 
   * Initial version
