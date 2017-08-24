@@ -61,6 +61,12 @@ values: ["auto", "false", "true"]
 default: ["auto"]
 
 [Changelog]
+dfn_dotnet (4.7.2053.0-2) stable; urgency=low
+
+Deklarationen waren doppelt, habe sie wieder in common.opsiinc belassen damit Variablen nur an einer Stelle befüllt werden und nur an einer Stelle geändert werden müssen.
+
+ -- Eric Esser <eric.esser@wzb.eu>  Thu, 24 Aug 2017 15:14:13 +0000
+
 dfn_dotnet (4.7.2053.0-1) stable; urgency=low
 
 Please add a short description.
