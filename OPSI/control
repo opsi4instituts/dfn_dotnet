@@ -1,5 +1,5 @@
 [Package]
-version: 3
+version: 4
 depends: 
 incremental: False
 
@@ -61,6 +61,12 @@ values: ["auto", "false", "true"]
 default: ["auto"]
 
 [Changelog]
+dfn_dotnet (4.7.2053.0-4) stable; urgency=low
+
+Bugfix: $INST_SystemType$ zugefügt.
+
+ -- Eric Esser <eric.esser@wzb.eu>  Wed, 06 Sep 2017 12:06:37 +0000
+
 dfn_dotnet (4.7.2053.0-2) stable; urgency=low
 
 Deklarationen waren doppelt, habe sie wieder in common.opsiinc belassen damit Variablen nur an einer Stelle befüllt werden und nur an einer Stelle geändert werden müssen.
