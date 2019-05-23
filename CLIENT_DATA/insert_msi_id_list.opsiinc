@@ -58,3 +58,11 @@ Set $UninstallMSIIDsStatic$ = addtolist($UninstallMSIIDsStatic$, "{63DF5C4B-E3BF
 Set $UninstallMSIIDsStatic$ = addtolist($UninstallMSIIDsStatic$, "{CD88F457-D2FD-3127-B64D-D6E13EBBCED6}")
 ;dotnetfx_4.7_en
 Set $UninstallMSIIDsStatic$ = addtolist($UninstallMSIIDsStatic$, "{BCF0C1F7-671C-3922-A7EA-8AC11F4FC0EB}")
+;dotnetfx_4.7.1_de
+Set $UninstallMSIIDsStatic$ = addtolist($UninstallMSIIDsStatic$, "{0A040F52-1CA2-34F1-982B-86FBA1644635}")
+;dotnetfx_4.7.1_en
+Set $UninstallMSIIDsStatic$ = addtolist($UninstallMSIIDsStatic$, "{E0C7523C-686B-3EE6-8FB1-CB4339E30EDD}")
+;dotnetfx_4.7.2_de
+Set $UninstallMSIIDsStatic$ = addtolist($UninstallMSIIDsStatic$, "{0A7FE58C-96B1-37E2-AA55-C5C0BF027F0A}")
+;dotnetfx_4.7.2_en
+Set $UninstallMSIIDsStatic$ = addtolist($UninstallMSIIDsStatic$, "{09CCBE8E-B964-30EF-AE84-6537AB4197F9}")
