@@ -69,8 +69,7 @@ Set $SetupStringDeutsch$  = "%ScriptPath%" + "\" +  $SetupFileDeutsch$
 if ($MSVersion$ = "10.0")
 	; Windows 10 installs .net updates as system updates. There are never ever any msi records in the registry.
 	Set $InstalledDotNetVersion$ = GetRegistryStringValue64("[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full] Version")
-	Sub_convert_version
-	Set $InstallationRequired$ = boolToString(not($InstalledDotNetVersion$ = $RequiredDotNetVersion$))
+	Set $InstallationRequired$ = boolToString(not(CompareDotSeparatedNumbers($Version$, "=", $InstalledDotNetVersion$ + ".0")))
 else
 	Set $InstallationRequired$ = boolToString((GetRegistryStringValue64("["+$ActVersionRegPath$+"] DisplayName") = ""))
 endif
@@ -92,7 +91,7 @@ endif
 
 if ($MSVersion$ = "10.0")
 	Set $InstalledDotNetVersion$ = GetRegistryStringValue64("[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\1031] Version")
-	Set $InstallationRequired$ = boolToString(not($InstalledDotNetVersion$ = $RequiredDotNetVersion$))
+	Set $InstallationRequired$ = boolToString(not(CompareDotSeparatedNumbers($Version$, "=", $InstalledDotNetVersion$ + ".0")))
 else
 	Set $InstallationRequired$ = boolToString((GetRegistryStringValue64("["+$ActVersionRegPathDeutsch$+"] DisplayName") = ""))
 endif
@@ -133,16 +132,4 @@ Set $ExitCode$ = getLastExitCode
 if stringToBool(isMsExitcodeFatal_short($ExitCode$, "True", $ErrorString$))
 ;if stringToBool(isMsExitcodeFatal(getLastExitCod, "True", $ErrorString$))
 	isFatalError
-endif
-
-[Sub_convert_version]
-Set $DotNetVersionParts$ = splitString($Version$, ".")
-if (count($DotNetVersionParts$) INT>= "3")
-	set $DotNetVersionParts$ = getsublist(0 : 2, $DotNetVersionParts$)
-	Set $RequiredDotNetVersion$ = takeString(2, $DotNetVersionParts$)
-	if (strLength($RequiredDotNetVersion$) INT< "5")
-		Set $RequiredDotNetVersion$ = "0" + $RequiredDotNetVersion$
-	endif
-	set $DotNetVersionParts$ = setStringInListAtIndex($RequiredDotNetVersion$, $DotNetVersionParts$, "2")
-	set $RequiredDotNetVersion$ = composestring($DotNetVersionParts$, ".")
 endif
