@@ -122,18 +122,6 @@ if (contains($UninstallProgram$, "{") AND contains($UninstallProgram$, "-") AND 
 	endif
 endif
 
-;if not (FileExists($UninstallProgram$))
-;	LogError "Suspicious! Found entry of installer in Registry, but $UninstallProgramm$ does not exist!?"
-;	isFatalError
-;endif
-;Set $InstallDir$ = ExtractFilePath($UninstallProgram$)
-
-;Winbatch_uninstall
-;Set $ExitCode$ = getLastExitCode
-;if stringToBool(isNSISExitcodeFatal($ExitCode$, "True", $ErrorString$))
-;		isFatalError
-;endif
-
 [Sub_check_exitcode]
 Set $ExitCode$ = getLastExitCode
 if stringToBool(isMsExitcodeFatal_short($ExitCode$, "True", $ErrorString$))
