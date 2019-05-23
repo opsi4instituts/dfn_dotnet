@@ -56,3 +56,10 @@ Set $languagemap$       = GetLocaleInfoMap
 Set $system_language$   = lower(getValue("system_default_language_id", $languagemap$))
 Set $INST_SystemType$   = GetSystemType
 ; ----------------------------------------------------------------
+
+if not ($INST_SystemType$ = "64 Bit System")
+	LogWarning "Only tested with 64 bit version! Please report to the maintainer successful installation on other windows versions."
+	; TODO: Registry checks made by ...64 functions - better to blog 32bit windows?!
+	;LogError "This package only support 32 bit windows - exit!"
+	;isFatalError
+endif
