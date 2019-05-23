@@ -111,7 +111,6 @@ Sub_check_exitcode
 $Uninstallstring$ $UninstallParameters$
 
 [sub_uninstall_older_versions]
-
 if not (GetRegistryStringValueSysnative("[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\%msiid%] DisplayName") = "")
 	Set $CurrentMsiId$ = '%msiid%'
 	Winbatch_uninstall
@@ -159,7 +158,6 @@ endif
 [Sub_check_exitcode]
 Set $ExitCode$ = getLastExitCode
 if stringToBool(isMsExitcodeFatal_short($ExitCode$, "True", $ErrorString$))
-;if stringToBool(isMsExitcodeFatal(getLastExitCod, "True", $ErrorString$))
 	isFatalError
 endif
 

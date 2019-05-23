@@ -17,7 +17,6 @@ requiredWinstVersion >= "4.12.0.16"
 ; Includes
 
 ; exitcode library von UIB (siehe C:\program files(x86)\opsi.org\opsi-client-agent\opsi-winst\lib) mit 'local functions'
-;importLib "%ScriptPath%\lib\uib_exitcode.opsiscript::isMsExitcodeFatal"
 importLib "%ScriptPath%\lib\uib_exitcode.opsiscript"
 
 ; Library registry search uninstall keys (local functions)
