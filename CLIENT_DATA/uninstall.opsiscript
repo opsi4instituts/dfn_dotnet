@@ -14,7 +14,6 @@ DefVar $CustomPostDeinstall$
 DefVar $UninstallSearchString$
 DefVar $RemoveOlderVersions$
 DefStringList $Uninstallstrings$ 
-DefStringList $UninstallMSIIDs$ 
 
 Set $RemoveOlderVersions$   = getProductProperty("remove-older-versions","true")
 
@@ -22,67 +21,9 @@ Set $UninstallSearchString$ = "Microsoft .NET Framework 4.7"
 
 Set $Uninstallstrings$ = addtolist($Uninstallstrings$, "%ScriptPath%\" + $SetupFileDeutsch$)
 Set $Uninstallstrings$ = addtolist($Uninstallstrings$, "%ScriptPath%\" + $SetupFile$)
+DefStringList $UninstallMSIIDsStatic$
 
-;msxml6
-Set $UninstallMSIIDs$ = addtolist($UninstallMSIIDs$, "{0A869A65-8C94-4F7C-A5C7-972D3C8CED9E}")
-;dotnetfx_2.0_language_pack_de
-Set $UninstallMSIIDs$ = addtolist($UninstallMSIIDs$, "{8937FCB2-2FC6-4FC3-9FB5-DE2C92DB9C38}")
-;dotnetfx_2.0_sp1_language_pack_de
-Set $UninstallMSIIDs$ = addtolist($UninstallMSIIDs$, "{9309DD7E-EBFE-3C95-8B47-30D3A012F606}")
-;dotnetfx_2.0_sp2_language_pack_de
-Set $UninstallMSIIDs$ = addtolist($UninstallMSIIDs$, "{C314CE45-3392-3B73-B4E1-139CD41CA933}")
-;dotnetfx_3.0_sp2_language_pack_de
-Set $UninstallMSIIDs$ = addtolist($UninstallMSIIDs$, "{C2C284D2-6BD7-3B34-B0C5-B2CAED168DF7}")
-;dotnetfx_3.0_sp1_language_pack_de
-Set $UninstallMSIIDs$ = addtolist($UninstallMSIIDs$, "{A1071AEB-B0EF-3F5F-BC84-83A270EBE496}")
-;dotnetfx_3.5_language_pack_de
-Set $UninstallMSIIDs$ = addtolist($UninstallMSIIDs$, "{1545207E-C6F3-31D7-9918-BDBB65075FBF}")
-;dotnetfx_3.5_sp1_language_pack_de
-Set $UninstallMSIIDs$ = addtolist($UninstallMSIIDs$, "{052FDD78-A6EA-3187-8386-C82F4CA3A929}")
-;dotnetfx_1.1
-Set $UninstallMSIIDs$ = addtolist($UninstallMSIIDs$, "{CB2F7EDD-9D1F-43C1-90FC-4F52EAE172A1}")
-;dotnetfx_2.0
-Set $UninstallMSIIDs$ = addtolist($UninstallMSIIDs$, "{7131646D-CD3C-40F4-97B9-CD9E4E6262EF}")
-;dotnetfx_2.0_sp1
-Set $UninstallMSIIDs$ = addtolist($UninstallMSIIDs$, "{B508B3F1-A24A-32C0-B310-85786919EF28}")
-;dotnetfx_2.0_sp2
-Set $UninstallMSIIDs$ = addtolist($UninstallMSIIDs$, "{C09FB3CD-3D0C-3F2D-899A-6A1D67F2073F}")
-;dotnetfx_3.0_sp1
-Set $UninstallMSIIDs$ = addtolist($UninstallMSIIDs$, "{2BA00471-0328-3743-93BD-FA813353A783}")
-;dotnetfx_3.0_sp2
-Set $UninstallMSIIDs$ = addtolist($UninstallMSIIDs$, "{A3051CD0-2F64-3813-A88D-B8DCCDE8F8C7}")
-;dotnetfx_3.5
-Set $UninstallMSIIDs$ = addtolist($UninstallMSIIDs$, "{2FC099BD-AC9B-33EB-809C-D332E1B27C40}")
-;dotnetfx_3.5_sp1
-Set $UninstallMSIIDs$ = addtolist($UninstallMSIIDs$, "{CE2CDD62-0124-36CA-84D3-9F4DCF5C5BD9}")
-;dotnetfx_4.0_extended
-Set $UninstallMSIIDs$ = addtolist($UninstallMSIIDs$, "{0A0CADCF-78DA-33C4-A350-CD51849B9702}")
-;dotnetfx_4.0_clientProfile
-Set $UninstallMSIIDs$ = addtolist($UninstallMSIIDs$, "{3C3901C5-3455-3E0A-A214-0B093A5070A6}")
-;dotnetfx_4.0_extended_language_pack_de
-Set $UninstallMSIIDs$ = addtolist($UninstallMSIIDs$, "{C911A0C2-2236-3164-AA47-F2566C01AE5E}")
-;dotnetfx_4.0_clientprofile_language_pack_de
-Set $UninstallMSIIDs$ = addtolist($UninstallMSIIDs$, "{F750C986-5310-3A5A-95F8-4EC71C8AC01C}")
-;dotnetfx_4.5.1
-Set $UninstallMSIIDs$ = addtolist($UninstallMSIIDs$, "{7DEBE4EB-6B40-3766-BB35-5CBBC385DA37}")
-;dotnet_x64_de_4.5.2
-Set $UninstallMSIIDs$ = addtolist($UninstallMSIIDs$, "{1DB0C90B-2A9F-3A1E-B1DF-616C5A2A1417}")
-;dotnet_x64_4.5.2_en
-Set $UninstallMSIIDs$ = addtolist($UninstallMSIIDs$, "{26784146-6E05-3FF9-9335-786C7C0FB5BE}")
-;dotnetfx_4.6.0
-Set $UninstallMSIIDs$ = addtolist($UninstallMSIIDs$, "{92FB6C44-E685-45AD-9B20-CADF4CABA132}")
-;dotnetfx_4.6.1_de
-Set $UninstallMSIIDs$ = addtolist($UninstallMSIIDs$, "{AAC5C889-B75D-3368-BC63-CB660DE44C66}")
-;dotnetfx_4.6.1_en
-Set $UninstallMSIIDs$ = addtolist($UninstallMSIIDs$, "{bd6f5371-dac1-30f0-9dde-cac6791e28c3}")
-;dotnetfx_4.6.2_de
-Set $UninstallMSIIDs$ = addtolist($UninstallMSIIDs$, "{98E12667-FD6F-313E-8ED4-9FEBE41F790B}")
-;dotnetfx_4.6.2_en
-Set $UninstallMSIIDs$ = addtolist($UninstallMSIIDs$, "{63DF5C4B-E3BF-3346-A033-C57B22F44C9E}")
-;dotnetfx_4.7_de
-Set $UninstallMSIIDs$ = addtolist($UninstallMSIIDs$, "{CD88F457-D2FD-3127-B64D-D6E13EBBCED6}")
-;dotnetfx_4.7_en
-Set $UninstallMSIIDs$ = addtolist($UninstallMSIIDs$, "{BCF0C1F7-671C-3922-A7EA-8AC11F4FC0EB}")
+include_insert "%ScriptPath%\insert_msi_id_list.opsiinc"
 ;==========================================================================================================
 ; Program logic
 comment "Show product picture"
@@ -99,7 +40,7 @@ sub_uninstall_by_registry
 if ($RemoveOlderVersions$ = "true")
   comment "Uninstalling older versions of .NET Framework ..."
   message "Uninstalling older versions of .NET Framework ..."
-  for %msiid% in $UninstallMSIIDs$ do sub_uninstall_older_versions
+  for %msiid% in $UninstallMSIIDsStatic$ do sub_uninstall_older_versions
   Set $UninstallSearchString$  = strpart($UninstallSearchString$, "1", "27")
   sub_uninstall_older_versions_by_registry
 endif
