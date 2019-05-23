@@ -88,7 +88,7 @@ if not (GetRegistryStringValueSysnative("[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\
 endif
 
 [Winbatch_uninstall]
-msiexec /x %msiid% /qb!
+msiexec /x %msiid% /qb! REBOOT=ReallySuppress
 
 [sub_uninstall_by_registry]
 ; Ergebnis ist StringList (mehrere Einträge möglich);
