@@ -36,19 +36,18 @@ DefStringList $languagemap$
 
 ; ----------------------------------------------------------------
 ; These values need to be adjusted to each version
-Set $ActVersionRegPath$			   = "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{BCF0C1F7-671C-3922-A7EA-8AC11F4FC0EB}"
-Set $ActVersionRegPathDeutsch$ = "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{CD88F457-D2FD-3127-B64D-D6E13EBBCED6}"
-Set $SetupFile$        			   = "NDP47-KB3186497-x86-x64-AllOS-ENU.exe"
-Set $SetupFileDeutsch$ 			   = stringReplace($SetupFile$, "ENU", "DEU")
+Set $ActVersionRegPath$         = "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{BCF0C1F7-671C-3922-A7EA-8AC11F4FC0EB}"
+Set $ActVersionRegPathDeutsch$  = "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{CD88F457-D2FD-3127-B64D-D6E13EBBCED6}"
+Set $SetupFile$                 = "NDP47-KB3186497-x86-x64-AllOS-ENU.exe"
+Set $SetupFileDeutsch$          = stringReplace($SetupFile$, "ENU", "DEU")
 ; ----------------------------------------------------------------
 ; These values stay the same
-Set $LogDir$           			= "%opsiLogDir%"
-Set $ProductId$       		 	= "dfn_dotnet"
-Set $Version$								= strPart("%installingProdVersion%", "1", calculate(strPos("%installingProdVersion%","-") + "-" + "1" ))
-Set $PrettyName$		 				= ".NET"
-Set $MinimumSpace$    			= "2500 MB"
-Set $languagemap$     			= GetLocaleInfoMap
-Set $system_language$  			= lower(getValue("system_default_language_id", $languagemap$))
-
+Set $LogDir$            = "%opsiLogDir%"
+Set $ProductId$         = "dfn_dotnet_dev"
+Set $Version$           = strPart("%installingProdVersion%", "1", calculate(strPos("%installingProdVersion%","-") + "-" + "1" ))
+Set $PrettyName$        = ".NET"
+Set $MinimumSpace$      = "2500 MB"
+Set $languagemap$       = GetLocaleInfoMap
+Set $system_language$   = lower(getValue("system_default_language_id", $languagemap$))
 Set $INST_SystemType$   = GetSystemType
 ; ----------------------------------------------------------------

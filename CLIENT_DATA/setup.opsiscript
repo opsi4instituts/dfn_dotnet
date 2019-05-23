@@ -51,7 +51,7 @@ if (CompareDotSeparatedNumbers(GetMsVersionInfo, "6.1") = "0")
 		comment "we do install KB4019990"
 		message "we do install KB4019990"
 		ChangeDirectory "%SCRIPTPATH%"
-        Winbatch_install
+		Winbatch_install
 	endif
 endif
 
