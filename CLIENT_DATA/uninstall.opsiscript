@@ -15,13 +15,13 @@ DefVar $UninstallSearchString$
 DefVar $RemoveOlderVersions$
 DefStringList $Uninstallstrings$ 
 
-Set $RemoveOlderVersions$   = getProductProperty("remove-older-versions","true")
-
-Set $UninstallSearchString$ = "Microsoft .NET Framework 4.7"
 
 Set $Uninstallstrings$ = addtolist($Uninstallstrings$, "%ScriptPath%\" + $SetupFileDeutsch$)
 Set $Uninstallstrings$ = addtolist($Uninstallstrings$, "%ScriptPath%\" + $SetupFile$)
 DefStringList $UninstallMSIIDsStatic$
+
+Set $RemoveOlderVersions$   = getProductProperty("remove-older-versions","true")
+Set $UninstallSearchString$ = "Microsoft .NET Framework 4.7"
 
 include_insert "%ScriptPath%\insert_msi_id_list.opsiinc"
 ;==========================================================================================================
