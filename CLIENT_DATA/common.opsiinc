@@ -37,6 +37,7 @@ DefVar $ActVersionRegPathDeutsch$
 DefVar $INST_SystemType$
 DefVar $ExitCode$
 DefVar $ErrorString$
+DefVar $MSVersion$
 DefStringList $languagemap$
 
 ; ----------------------------------------------------------------
@@ -55,6 +56,7 @@ Set $MinimumSpace$      = "2500 MB"
 Set $languagemap$       = GetLocaleInfoMap
 Set $system_language$   = lower(getValue("system_default_language_id", $languagemap$))
 Set $INST_SystemType$   = GetSystemType
+Set $MSVersion$         = GetMsVersionInfo
 ; ----------------------------------------------------------------
 
 if not ($INST_SystemType$ = "64 Bit System")
