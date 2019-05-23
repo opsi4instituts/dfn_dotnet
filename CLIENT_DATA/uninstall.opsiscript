@@ -27,7 +27,7 @@ DefStringList $UninstallMSIIDsByReg$
 DefStringList $ResultList$
 
 Set $RemoveOlderVersions$   = getProductProperty("remove-older-versions","true")
-Set $UninstallSearchString$ = "Microsoft .NET Framework 4.7"
+Set $UninstallSearchString$ = "Microsoft .NET Framework 4.8"
 
 if ($MSVersion$ = "10.0")
 	; Windows 10
