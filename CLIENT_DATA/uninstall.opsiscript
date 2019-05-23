@@ -13,7 +13,7 @@ DefVar $CustomPostDeinstall$
 DefVar $UninstallSearchString$
 DefVar $RemoveOlderVersions$
 DefVar $UninstallString$
-DefStringList $Uninstallstrings$ 
+DefVar $UninstallParameters$
 
 DefVar $RegId$
 DefVar $RegBitScope$
@@ -21,8 +21,7 @@ DefVar $RegName$
 DefVar $UninstallProgram$
 DefStringList $regUninstallerEntry$
 
-Set $Uninstallstrings$ = addtolist($Uninstallstrings$, "%ScriptPath%\" + $SetupFileDeutsch$)
-Set $Uninstallstrings$ = addtolist($Uninstallstrings$, "%ScriptPath%\" + $SetupFile$)
+DefStringList $Uninstallstrings$
 DefStringList $UninstallMSIIDsStatic$
 DefStringList $UninstallMSIIDsByReg$
 DefStringList $ResultList$
@@ -30,7 +29,30 @@ DefStringList $ResultList$
 Set $RemoveOlderVersions$   = getProductProperty("remove-older-versions","true")
 Set $UninstallSearchString$ = "Microsoft .NET Framework 4.7"
 
-include_insert "%ScriptPath%\insert_msi_id_list.opsiinc"
+if ($MSVersion$ = "10.0")
+	; Windows 10
+	comment "Windows 10 installs .net updates as system updates. There are never any msi records in the registry. Would always start setup!"
+	; WUSA does not work on windows 10 if using /quiet parameter
+	; DEU
+	;Set $Uninstallstrings$ = addtolist($Uninstallstrings$, "wusa /uninstall /kb:4486159")
+	; ENU
+	;Set $Uninstallstrings$ = addtolist($Uninstallstrings$, "wusa /uninstall /kb:4486153")
+	;Set $UninstallParameters$   = "/quiet /norestart /log:" + '"' + $LogDir$ + "\" + $ProductId$ + ".uninstall_log.txt" + '"'
+	; Use dism instead - needs powershell helper script which could fail if policy set by GPOs
+	; DEU
+	Set $Uninstallstrings$ = addtolist($Uninstallstrings$, 'powershell -Executionpolicy Bypass -File "%ScriptPath%\lib\Remove-HotfixByDism.ps1" -KB 4486159')
+	; ENU
+	Set $Uninstallstrings$ = addtolist($Uninstallstrings$, 'powershell -Executionpolicy Bypass -File "%ScriptPath%\lib\Remove-HotfixByDism.ps1" -KB 4486153')
+	; Logs für enu/ger gleich - da nur bei Fehler relevant sollte letztes genuegen!
+else
+	; Windows 7
+	Set $Uninstallstrings$    = addtolist($Uninstallstrings$, "%ScriptPath%\" + $SetupFileDeutsch$)
+	Set $Uninstallstrings$    = addtolist($Uninstallstrings$, "%ScriptPath%\" + $SetupFile$)
+	Set $UninstallParameters$ = "/uninstall /passive /norestart /log " + '"' + $LogDir$ + "\" + $ProductId$ + ".uninstall_log.txt" + '"'
+
+	; Load all msi-ids - only necessarry for win7!
+	include_insert "%ScriptPath%\insert_msi_id_list.opsiinc"
+endif
 ;==========================================================================================================
 ; Program logic
 comment "Show product picture"
@@ -70,12 +92,12 @@ endif
 ; Functions
 
 [Sub_uninstall_actual_version]
-Set $Uninstallstring$ = "%Uninstallstring%"
+Set $Uninstallstring$ = '%Uninstallstring%'
 Winbatch_uninstall_actual_version
 Sub_check_exitcode
 
 [Winbatch_uninstall_actual_version]
-$Uninstallstring$ /uninstall /passive /norestart /log "$LogDir$\$ProductId$.uninstall_log.txt"
+$Uninstallstring$ $UninstallParameters$
 
 [sub_uninstall_older_versions]
 
