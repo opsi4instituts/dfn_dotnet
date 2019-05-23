@@ -57,9 +57,9 @@ endif
 
 ;==========================================================================================================
 
-Set $SetupString$ 			= "%ScriptPath%" + "\" + $SetupFile$
-Set $SetupStringCommand$	= " /passive /norestart /log $LogDir$\$ProductId$.install_log.txt"
-Set $SetupStringDeutsch$	= "%ScriptPath%" + "\" +  $SetupFileDeutsch$
+Set $SetupString$         = "%ScriptPath%" + "\" + $SetupFile$
+Set $SetupStringCommand$  = " /passive /norestart /log " + '"' + $LogDir$ + "\" + $ProductId$ + ".install_log.txt" + '"'
+Set $SetupStringDeutsch$  = "%ScriptPath%" + "\" +  $SetupFileDeutsch$
 
 		
 if ((GetRegistryStringValue64("["+$ActVersionRegPath$+"] DisplayName") = "") or (getProductProperty("forcereinstall","False") = "True"))	
@@ -80,8 +80,8 @@ endif
 
 if ((GetRegistryStringValue64("["+$ActVersionRegPathDeutsch$+"] DisplayName") = "") or (getProductProperty("forcereinstall","False") = "True"))	
 	if ((getProductProperty("german-language-pack","auto") = "True") or ((getProductProperty("german-language-pack","auto") = "auto") and ($system_language$ = "0407") ) )
-		Set $SetupString$ = "%ScriptPath%" + "\" + $SetupFileDeutsch$
-		Set $SetupStringCommand$ = " /passive /norestart /log $LogDir$\$ProductId$.install_log.txt" 
+		Set $SetupString$ = $SetupStringDeutsch$
+		Set $SetupStringCommand$ = stringReplace($SetupStringCommand$, $ProductId$, $ProductId$ + "_ger_lp")
 		if FileExists($SetupString$)
 			comment "Installing German language pack"
 			message "Installing German language pack"
