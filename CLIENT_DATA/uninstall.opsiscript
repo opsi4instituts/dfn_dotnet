@@ -6,19 +6,26 @@
 ;==========================================================================================================
 ; Includes
 include_insert "%ScriptPath%\common.opsiinc"
-include_insert "%ScriptPath%\lib\insert_uninstall_by_registry_dotnet.opsiinc"
 
 ;==========================================================================================================
 ; Variables 
 DefVar $CustomPostDeinstall$
 DefVar $UninstallSearchString$
 DefVar $RemoveOlderVersions$
+DefVar $UninstallString$
 DefStringList $Uninstallstrings$ 
 
+DefVar $RegId$
+DefVar $RegBitScope$
+DefVar $RegName$
+DefVar $UninstallProgram$
+DefStringList $regUninstallerEntry$
 
 Set $Uninstallstrings$ = addtolist($Uninstallstrings$, "%ScriptPath%\" + $SetupFileDeutsch$)
 Set $Uninstallstrings$ = addtolist($Uninstallstrings$, "%ScriptPath%\" + $SetupFile$)
 DefStringList $UninstallMSIIDsStatic$
+DefStringList $UninstallMSIIDsByReg$
+DefStringList $ResultList$
 
 Set $RemoveOlderVersions$   = getProductProperty("remove-older-versions","true")
 Set $UninstallSearchString$ = "Microsoft .NET Framework 4.7"
@@ -34,15 +41,19 @@ comment "Uninstalling " + $ProductId$ + "..."
 message "Uninstalling " + $ProductId$ + " ..."
 for %Uninstallstring% in $Uninstallstrings$ do Sub_uninstall_actual_version
 
-; Sub function in section_uninstall_by_registry.opsiinc - variable set in commons.opsiinc
+; Local function in func_search_registry_uninstall_keys.opsiinc - variable set in commons.opsiinc
 sub_uninstall_by_registry
+for %msiid% in $UninstallMSIIDsByReg$ do sub_uninstall_older_versions
 
 if ($RemoveOlderVersions$ = "true")
-  comment "Uninstalling older versions of .NET Framework ..."
-  message "Uninstalling older versions of .NET Framework ..."
-  for %msiid% in $UninstallMSIIDsStatic$ do sub_uninstall_older_versions
-  Set $UninstallSearchString$  = strpart($UninstallSearchString$, "1", "27")
-  sub_uninstall_older_versions_by_registry
+	comment "Uninstalling older versions of .NET Framework ..."
+	message "Uninstalling older versions of .NET Framework ..."
+	for %msiid% in $UninstallMSIIDsStatic$ do sub_uninstall_older_versions
+	; Search for all .net 4 Versions
+	Set $UninstallSearchString$  = strpart($UninstallSearchString$, "1", "27")
+	Set $UninstallMSIIDsByReg$ = emptyList($UninstallMSIIDsByReg$)
+	sub_uninstall_by_registry
+	for %msiid% in $UninstallMSIIDsByReg$ do sub_uninstall_older_versions
 endif
 
 ; Include post deinstall file in custom folder via OPSI property 
@@ -79,10 +90,49 @@ endif
 [Winbatch_uninstall]
 msiexec /x %msiid% /qb!
 
-[sub_uninstall_older_versions_by_registry]
-sub_uninstall_by_registry
+[sub_uninstall_by_registry]
+; Ergebnis ist StringList (mehrere Einträge möglich);
+; in einer Zeile werden drei Ergebnisse mit "|" abgetrennt geliefert: Registrykey (mit Pfad) | Bereich Registry (kann direkt getRegistryValue übergeben werden | DisplayName
+; z.B. HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Test64|64bit|Test Registry Entry64
+Set $ResultList$ = SearchRegistryUninstallKeys($UninstallSearchString$)
 
+if (count ($ResultList$) = "0")
+	comment "No installations of " + $UninstallSearchString$ + " found in registry"
+else
+	Message "Uninstalling " + $UninstallSearchString$ + " ..."
+	comment "Found at least one installation of " + $UninstallSearchString$ + " in registry, try to deinstall"
+	for %registryuninstaller% in $ResultList$ do sub_uninstall_by_registry_process_entry
+endif
 
+[sub_uninstall_by_registry_process_entry]
+set $regUninstallerEntry$ = splitstring('%registryuninstaller%', '|')
+Set $RegId$               = takeString(0,$regUninstallerEntry$)
+Set $RegBitScope$         = takeString(1,$regUninstallerEntry$)
+Set $RegName$             = takeString(2,$regUninstallerEntry$)
+
+Set $UninstallProgram$ = GetRegistryValue($RegId$, "UninstallString", $RegBitScope$)
+
+; Extract MSI-ID by uninstallProgram -> don't use takeString (-1,splitString($RegId$, '\')) - there are non msi entry mit guid regkey
+if (contains($UninstallProgram$, "{") AND contains($UninstallProgram$, "-") AND contains($UninstallProgram$, "}"))
+	Set $tempString$ = takeString (1,splitString($UninstallProgram$, '{'))
+	Set $tempString$ = takeString (0,splitString($tempString$, '}'))
+	Set $tempString$ = '{' + $tempString$ + '}'
+	if not(contains($tempString$, " "))
+		Set $UninstallMSIIDsByReg$ = addtolist($UninstallMSIIDsByReg$, $tempString$)
+	endif
+endif
+
+;if not (FileExists($UninstallProgram$))
+;	LogError "Suspicious! Found entry of installer in Registry, but $UninstallProgramm$ does not exist!?"
+;	isFatalError
+;endif
+;Set $InstallDir$ = ExtractFilePath($UninstallProgram$)
+
+;Winbatch_uninstall
+;Set $ExitCode$ = getLastExitCode
+;if stringToBool(isNSISExitcodeFatal($ExitCode$, "True", $ErrorString$))
+;		isFatalError
+;endif
 
 [Sub_check_exitcode]
 Set $ExitCode$ = getLastExitCode

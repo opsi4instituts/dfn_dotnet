@@ -20,6 +20,9 @@ requiredWinstVersion >= "4.12.0.16"
 ;importLib "%ScriptPath%\lib\uib_exitcode.opsiscript::isMsExitcodeFatal"
 importLib "%ScriptPath%\lib\uib_exitcode.opsiscript"
 
+; Library registry search uninstall keys (local functions)
+importLib "%ScriptPath%\lib\func_search_registry_uninstall_keys.opsiinc"
+
 ;==========================================================================================================
 ; Variables 
 
@@ -37,6 +40,7 @@ DefVar $ActVersionRegPathDeutsch$
 DefVar $INST_SystemType$
 DefVar $ExitCode$
 DefVar $ErrorString$
+DefVar $tempString$
 DefVar $MSVersion$
 DefStringList $languagemap$
 
