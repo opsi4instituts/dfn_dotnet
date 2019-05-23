@@ -16,7 +16,6 @@ DefVar $SetupString$
 DefVar $SetupStringCommand$
 DefVar $SetupStringDeutsch$
 
-DefVar $INST_SystemType$
 DefVar $Setup_prepatch_x64$
 DefVar $Setup_prepatch_x86$
 

@@ -31,6 +31,7 @@ DefVar $system_language$
 DefVar $ActVersionMSIID$
 DefVar $ActVersionRegPath$
 DefVar $ActVersionRegPathDeutsch$
+DefVar $INST_SystemType$
 DefStringList $languagemap$
 
 ; ----------------------------------------------------------------
@@ -49,4 +50,5 @@ Set $MinimumSpace$    			= "2500 MB"
 Set $languagemap$     			= GetLocaleInfoMap
 Set $system_language$  			= lower(getValue("system_default_language_id", $languagemap$))
 
+Set $INST_SystemType$   = GetSystemType
 ; ----------------------------------------------------------------
