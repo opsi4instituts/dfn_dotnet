@@ -70,7 +70,10 @@ $Uninstallstring$ /uninstall /passive /norestart /log "$LogDir$\$ProductId$.unin
 
 if not (GetRegistryStringValueSysnative("[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\%msiid%] DisplayName") = "")
 	Winbatch_uninstall
-	sub_check_exitcode
+	; Check exitcode for MSI (instead of MS exe installer with reduced list of exit codes)
+	if stringToBool(isMsiExitcodeFatal(getLastExitCode, "True", $ErrorString$))
+		isFatalError
+	endif
 endif
 
 [Winbatch_uninstall]
@@ -80,5 +83,12 @@ msiexec /x %msiid% /qb!
 sub_uninstall_by_registry
 
 
+
+[Sub_check_exitcode]
+Set $ExitCode$ = getLastExitCode
+if stringToBool(isMsExitcodeFatal_short($ExitCode$, "True", $ErrorString$))
+;if stringToBool(isMsExitcodeFatal(getLastExitCod, "True", $ErrorString$))
+	isFatalError
+endif
 
 
