@@ -23,6 +23,12 @@ userLoginScript:
 
 [ProductProperty]
 type: bool
+name: remove-by-registry-search
+description: Try to automatically find the msi ids of installed products containing the configured DisplayName. (Need to remove older x86 versions)
+default: False
+
+[ProductProperty]
+type: bool
 name: remove-older-versions
 description: Remove older versions of .NET 4.x
 default: True

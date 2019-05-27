@@ -12,6 +12,7 @@ include_insert "%ScriptPath%\common.opsiinc"
 DefVar $CustomPostDeinstall$
 DefVar $UninstallSearchString$
 DefVar $RemoveOlderVersions$
+DefVar $RemoveByRegistrySearch$
 DefVar $UninstallString$
 DefVar $UninstallParameters$
 DefVar $InstalledDotNetVersion$
@@ -30,6 +31,7 @@ DefStringList $ResultList$
 
 Set $RemoveOlderVersions$   = getProductProperty("remove-older-versions","true")
 Set $UninstallSearchString$ = "Microsoft .NET Framework 4.8"
+Set $RemoveByRegistrySearch$ = getProductProperty("remove-by-registry-search","false")
 
 if ($MSVersion$ = "10.0")
 	; Windows 10
@@ -69,18 +71,22 @@ if (CompareDotSeparatedNumbers($Version$, "=", $InstalledDotNetVersion$ + ".0"))
 endif
 
 ; Local function in func_search_registry_uninstall_keys.opsiinc - variable set in commons.opsiinc
-sub_uninstall_by_registry
-for %msiid% in $UninstallMSIIDsByReg$ do sub_uninstall_older_versions
+if (stringToBool($RemoveByRegistrySearch$))
+	sub_uninstall_by_registry
+	for %msiid% in $UninstallMSIIDsByReg$ do sub_uninstall_older_versions
+endif
 
 if ($RemoveOlderVersions$ = "true")
 	comment "Uninstalling older versions of .NET Framework ..."
 	message "Uninstalling older versions of .NET Framework ..."
 	for %msiid% in $UninstallMSIIDsStatic$ do sub_uninstall_older_versions
-	; Search for all .net 4 Versions
-	Set $UninstallSearchString$  = strpart($UninstallSearchString$, "1", "27")
-	Set $UninstallMSIIDsByReg$ = emptyList($UninstallMSIIDsByReg$)
-	sub_uninstall_by_registry
-	for %msiid% in $UninstallMSIIDsByReg$ do sub_uninstall_older_versions
+	if (stringToBool($RemoveByRegistrySearch$))
+		; Search for all .net 4 Versions
+		Set $UninstallSearchString$  = strpart($UninstallSearchString$, "1", "27")
+		Set $UninstallMSIIDsByReg$ = emptyList($UninstallMSIIDsByReg$)
+		sub_uninstall_by_registry
+		for %msiid% in $UninstallMSIIDsByReg$ do sub_uninstall_older_versions
+	endif
 endif
 
 ; Include post deinstall file in custom folder via OPSI property 
