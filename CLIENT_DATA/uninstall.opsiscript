@@ -15,6 +15,7 @@ DefVar $RemoveOlderVersions$
 DefVar $UninstallString$
 DefVar $UninstallParameters$
 
+DefVar $CurrentMsiId$
 DefVar $RegId$
 DefVar $RegBitScope$
 DefVar $RegName$
@@ -102,6 +103,7 @@ $Uninstallstring$ $UninstallParameters$
 [sub_uninstall_older_versions]
 
 if not (GetRegistryStringValueSysnative("[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\%msiid%] DisplayName") = "")
+	Set $CurrentMsiId$ = '%msiid%'
 	Winbatch_uninstall
 	; Check exitcode for MSI (instead of MS exe installer with reduced list of exit codes)
 	if stringToBool(isMsiExitcodeFatal(getLastExitCode, "True", $ErrorString$))
@@ -110,7 +112,7 @@ if not (GetRegistryStringValueSysnative("[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\
 endif
 
 [Winbatch_uninstall]
-msiexec /x %msiid% /qb! REBOOT=ReallySuppress
+msiexec /x $CurrentMsiId$ /l* "$LogDir$\$ProductId$-GUID-$CurrentMsiId$.uninstall_log.txt" /qb-! REBOOT=ReallySuppress
 
 [sub_uninstall_by_registry]
 ; Ergebnis ist StringList (mehrere Einträge möglich);
