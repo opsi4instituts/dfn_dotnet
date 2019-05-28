@@ -16,9 +16,13 @@ DefVar $SetupString$
 DefVar $SetupStringCommand$
 DefVar $SetupStringDeutsch$
 
-DefVar $INST_SystemType$
 DefVar $Setup_prepatch_x64$
 DefVar $Setup_prepatch_x86$
+
+DefVar $InstalledDotNetVersion$
+DefVar $InstallationRequired$
+DefVar $RequiredDotNetVersion$
+DefStringList $DotNetVersionParts$
 
 ;==========================================================================================================
 ; Program logic
@@ -52,19 +56,25 @@ if (CompareDotSeparatedNumbers(GetMsVersionInfo, "6.1") = "0")
 		comment "we do install KB4019990"
 		message "we do install KB4019990"
 		ChangeDirectory "%SCRIPTPATH%"
-        Winbatch_install
+		Winbatch_install
 	endif
 endif
 
 ;==========================================================================================================
 
-Set $SetupString$ 			= "%ScriptPath%" + "\" + $SetupFile$
-Set $SetupStringCommand$	= " /passive /norestart /log $LogDir$\$ProductId$.install_log.txt"
-Set $SetupStringDeutsch$	= "%ScriptPath%" + "\" +  $SetupFileDeutsch$
+Set $SetupString$         = "%ScriptPath%" + "\" + $SetupFile$
+Set $SetupStringCommand$  = " /passive /norestart /log " + '"' + $LogDir$ + "\" + $ProductId$ + ".install_log.txt" + '"'
+Set $SetupStringDeutsch$  = "%ScriptPath%" + "\" +  $SetupFileDeutsch$
 
-		
-if ((GetRegistryStringValue64("["+$ActVersionRegPath$+"] DisplayName") = "") or (getProductProperty("forcereinstall","False") = "True"))	
-  if FileExists($SetupString$)
+if ($MSVersion$ = "10.0")
+	; Windows 10 installs .net updates as system updates. There are never ever any msi records in the registry.
+	Set $InstalledDotNetVersion$ = GetRegistryStringValue64("[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full] Version")
+	Set $InstallationRequired$ = boolToString(not(CompareDotSeparatedNumbers($Version$, "=", $InstalledDotNetVersion$ + ".0")))
+else
+	Set $InstallationRequired$ = boolToString((GetRegistryStringValue64("["+$ActVersionRegPath$+"] DisplayName") = ""))
+endif
+if ((stringToBool($InstallationRequired$)) or (getProductProperty("forcereinstall","False") = "True"))
+	if FileExists($SetupString$)
 		comment "Start setup program"
 		ChangeDirectory "%SCRIPTPATH%"
 		Winbatch_install
@@ -79,10 +89,16 @@ else
 	message $PrettyName$ + " " + $Version$ + " already installed. No forced reinstall selected, thus skipping installation"
 endif
 
-if ((GetRegistryStringValue64("["+$ActVersionRegPathDeutsch$+"] DisplayName") = "") or (getProductProperty("forcereinstall","False") = "True"))	
+if ($MSVersion$ = "10.0")
+	Set $InstalledDotNetVersion$ = GetRegistryStringValue64("[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\1031] Version")
+	Set $InstallationRequired$ = boolToString(not(CompareDotSeparatedNumbers($Version$, "=", $InstalledDotNetVersion$ + ".0")))
+else
+	Set $InstallationRequired$ = boolToString((GetRegistryStringValue64("["+$ActVersionRegPathDeutsch$+"] DisplayName") = ""))
+endif
+if ((stringToBool($InstallationRequired$)) or (getProductProperty("forcereinstall","False") = "True"))
 	if ((getProductProperty("german-language-pack","auto") = "True") or ((getProductProperty("german-language-pack","auto") = "auto") and ($system_language$ = "0407") ) )
-		Set $SetupString$ = "%ScriptPath%" + "\" + $SetupFileDeutsch$
-		Set $SetupStringCommand$ = " /passive /norestart /log $LogDir$\$ProductId$.install_log.txt" 
+		Set $SetupString$ = $SetupStringDeutsch$
+		Set $SetupStringCommand$ = stringReplace($SetupStringCommand$, $ProductId$, $ProductId$ + "_ger_lp")
 		if FileExists($SetupString$)
 			comment "Installing German language pack"
 			message "Installing German language pack"
@@ -110,3 +126,10 @@ endif
 
 [Winbatch_install]
 $SetupString$ $SetupStringCommand$
+
+[Sub_check_exitcode]
+Set $ExitCode$ = getLastExitCode
+if stringToBool(isMsExitcodeFatal_short($ExitCode$, "True", $ErrorString$))
+;if stringToBool(isMsExitcodeFatal(getLastExitCod, "True", $ErrorString$))
+	isFatalError
+endif

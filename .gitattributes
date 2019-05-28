@@ -1,0 +1,2 @@
+# force shell scripts to have lf instead of crlf on windows
+/OPSI/* text eol=lf

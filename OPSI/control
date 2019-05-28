@@ -1,5 +1,5 @@
 [Package]
-version: 4
+version: 1
 depends: 
 incremental: False
 
@@ -9,7 +9,7 @@ id: dfn_dotnet
 name: .NET
 description: NET Framework is a software framework that includes a large class library and provides language interoperability across several programming languages.
 advice: 
-version: 4.7.2053.0
+version: 4.8.3761.0
 priority: 0
 licenseRequired: False
 productClasses: 
@@ -20,6 +20,12 @@ alwaysScript:
 onceScript: 
 customScript: 
 userLoginScript: 
+
+[ProductProperty]
+type: bool
+name: remove-by-registry-search
+description: Try to automatically find the msi ids of installed products containing the configured DisplayName. (Need to remove older x86 versions)
+default: False
 
 [ProductProperty]
 type: bool
@@ -61,6 +67,16 @@ values: ["auto", "false", "true"]
 default: ["auto"]
 
 [Changelog]
+dfn_dotnet (4.8.3761.0-1) stable; urgency=low
+
+Bugfix: $INST_SystemType$ mit Inhalt gefüllt
+Change: update zu .net 4.8.0 (ersetzt wie vorherige Versionen der 4.x Reihe alle anderen 4.x Versionen)
+Change: Nutzung der "local functions" uib_exitcodes (im Winst-lib vorhanden, dennoch kopiert)
+Change: Nutzung der "local functions" func_search_registry_uninstall_keys
+Change: Support Windows 10 uninstall
+
+ -- Mattias Baake <mattias.baake@ub.uni-osnabrueck.de>  Wed, 22 May 2019 12:51:55 +0000
+
 dfn_dotnet (4.7.2053.0-4) stable; urgency=low
 
 Bugfix: $INST_SystemType$ zugefügt.

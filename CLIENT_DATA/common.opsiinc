@@ -11,11 +11,16 @@ ScriptErrorMessages=on
 TraceMode=off
 ; let started programs run in front of the winst window
 StayOnTop=false
-requiredWinstVersion >= "4.11.5.0"
+requiredWinstVersion >= "4.12.0.16"
 
 ;==========================================================================================================
 ; Includes
-include_insert "%ScriptPath%\lib\insert_check_exit_code.opsiinc"
+
+; exitcode library von UIB (siehe C:\program files(x86)\opsi.org\opsi-client-agent\opsi-winst\lib) mit 'local functions'
+importLib "%ScriptPath%\lib\uib_exitcode.opsiscript"
+
+; Library registry search uninstall keys (local functions)
+importLib "%ScriptPath%\lib\func_search_registry_uninstall_keys.opsiinc"
 
 ;==========================================================================================================
 ; Variables 
@@ -31,22 +36,35 @@ DefVar $system_language$
 DefVar $ActVersionMSIID$
 DefVar $ActVersionRegPath$
 DefVar $ActVersionRegPathDeutsch$
+DefVar $INST_SystemType$
+DefVar $ExitCode$
+DefVar $ErrorString$
+DefVar $tempString$
+DefVar $MSVersion$
 DefStringList $languagemap$
 
 ; ----------------------------------------------------------------
 ; These values need to be adjusted to each version
-Set $ActVersionRegPath$			   = "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{BCF0C1F7-671C-3922-A7EA-8AC11F4FC0EB}"
-Set $ActVersionRegPathDeutsch$ = "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{CD88F457-D2FD-3127-B64D-D6E13EBBCED6}"
-Set $SetupFile$        			   = "NDP47-KB3186497-x86-x64-AllOS-ENU.exe"
-Set $SetupFileDeutsch$ 			   = stringReplace($SetupFile$, "ENU", "DEU")
+Set $ActVersionRegPath$         = "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{16735AF7-1D8D-3681-94A5-C578A61EC832}"
+Set $ActVersionRegPathDeutsch$  = "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{21B11ACB-056E-30AE-BDF8-3C1BEAF0B3D3}"
+Set $SetupFile$                 = "ndp48-x86-x64-allos-enu.exe"
+Set $SetupFileDeutsch$          = stringReplace($SetupFile$, "ENU", "DEU")
 ; ----------------------------------------------------------------
 ; These values stay the same
-Set $LogDir$           			= "%opsiLogDir%"
-Set $ProductId$       		 	= "dfn_dotnet"
-Set $Version$								= strPart("%installingProdVersion%", "1", calculate(strPos("%installingProdVersion%","-") + "-" + "1" ))
-Set $PrettyName$		 				= ".NET"
-Set $MinimumSpace$    			= "2500 MB"
-Set $languagemap$     			= GetLocaleInfoMap
-Set $system_language$  			= lower(getValue("system_default_language_id", $languagemap$))
-
+Set $LogDir$            = "%opsiLogDir%"
+Set $ProductId$         = "dfn_dotnet_dev"
+Set $Version$           = strPart("%installingProdVersion%", "1", calculate(strPos("%installingProdVersion%","-") + "-" + "1" ))
+Set $PrettyName$        = ".NET"
+Set $MinimumSpace$      = "2500 MB"
+Set $languagemap$       = GetLocaleInfoMap
+Set $system_language$   = lower(getValue("system_default_language_id", $languagemap$))
+Set $INST_SystemType$   = GetSystemType
+Set $MSVersion$         = GetMsVersionInfo
 ; ----------------------------------------------------------------
+
+if not ($INST_SystemType$ = "64 Bit System")
+	LogWarning "Only tested with 64 bit version! Please report to the maintainer successful installation on other windows versions."
+	; TODO: Registry checks made by ...64 functions - better to blog 32bit windows?!
+	;LogError "This package only support 32 bit windows - exit!"
+	;isFatalError
+endif
