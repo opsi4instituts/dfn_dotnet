@@ -48,11 +48,11 @@ DefStringList $languagemap$
 Set $ActVersionRegPath$         = "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{16735AF7-1D8D-3681-94A5-C578A61EC832}"
 Set $ActVersionRegPathDeutsch$  = "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{21B11ACB-056E-30AE-BDF8-3C1BEAF0B3D3}"
 Set $SetupFile$                 = "ndp48-x86-x64-allos-enu.exe"
-Set $SetupFileDeutsch$          = stringReplace($SetupFile$, "ENU", "DEU")
+Set $SetupFileDeutsch$          = stringReplace($SetupFile$, "enu", "deu")
 ; ----------------------------------------------------------------
 ; These values stay the same
 Set $LogDir$            = "%opsiLogDir%"
-Set $ProductId$         = "dfn_dotnet_dev"
+Set $ProductId$         = "dfn_dotnet"
 Set $Version$           = strPart("%installingProdVersion%", "1", calculate(strPos("%installingProdVersion%","-") + "-" + "1" ))
 Set $PrettyName$        = ".NET"
 Set $MinimumSpace$      = "2500 MB"
