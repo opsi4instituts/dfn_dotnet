@@ -76,6 +76,7 @@ endif
 if ((stringToBool($InstallationRequired$)) or (getProductProperty("forcereinstall","False") = "True"))
 	if FileExists($SetupString$)
 		comment "Start setup program"
+		message "Start setup program"
 		ChangeDirectory "%SCRIPTPATH%"
 		Winbatch_install
 		Sub_check_exitcode
