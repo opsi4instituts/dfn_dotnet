@@ -1,5 +1,5 @@
 [Package]
-version: 1
+version: 2
 depends: 
 incremental: False
 
@@ -68,6 +68,13 @@ values: ["auto", "false", "true"]
 default: ["auto"]
 
 [Changelog]
+dfn_dotnet (4.8.3761.0-2) stable; urgency=low
+
+Bugfix: Installation unter Win10 gibt Fehler 5100, wenn ein anderes Update installiert worden ist
+           (Erzeugt nun Neustart, um zunächst Updates zuende zu installieren.)
+
+ -- Mattias Baake <mattias.baake@ub.uni-osnabrueck.de>  Wed, 21 Aug 2019 11:50:16 +0000
+
 dfn_dotnet (4.8.3761.0-1) stable; urgency=low
 
 Bugfix: $INST_SystemType$ mit Inhalt gefüllt
